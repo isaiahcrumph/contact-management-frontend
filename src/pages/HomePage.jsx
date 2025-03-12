@@ -1,119 +1,124 @@
-import React, { useState } from 'react';
+// src/pages/HomePage.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout';
 import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
-import Message from '../components/feedback/Message';
+import { contactService, authService } from '../services/api';
 
 const HomePage = () => {
-  // State for sample data
-  const [contacts, setContacts] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phoneNumber: "555-123-4567",
-      address: "123 Main St",
-      city: "Seattle",
-      state: "WA",
-      zipCode: "98101"
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phoneNumber: "555-987-6543",
-      address: "456 Pine Ave",
-      city: "Portland",
-      state: "OR",
-      zipCode: "97201"
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      phoneNumber: "555-555-5555",
-      address: "789 Oak Blvd",
-      city: "San Francisco",
-      state: "CA",
-      zipCode: "94101"
-    }
-  ]);
-  
-  const [loading, setLoading] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [currentContact, setCurrentContact] = useState(null);
   const [selectedContactId, setSelectedContactId] = useState(null);
+  const navigate = useNavigate();
 
-  // Mock handlers for CRUD operations
+  // Check authentication and load contacts on mount
+// Modified useEffect in HomePage.jsx
+// Updated isAuthenticated function for api.js
+isAuthenticated: () => {
+  const token = localStorage.getItem('token');
+  console.log('Authentication check - token exists:', !!token);
+  
+  // For now, just check if the token exists
+  return !!token;
+}
+
+  // Fetch contacts from API
+  const fetchContacts = async () => {
+    try {
+      setLoading(true);
+      const data = await contactService.getAllContacts();
+      setContacts(Array.isArray(data) ? data : (data.contacts || []));
+      setError(null);
+    } catch (err) {
+      setError('Failed to load contacts. Please try again.');
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/login');
+  };
+
+  // CRUD Operations
   const handleCreate = () => {
     setCurrentContact(null);
     setShowForm(true);
   };
 
   const handleRead = () => {
+    fetchContacts();
     setShowForm(false);
     setCurrentContact(null);
-    setMessage(null);
     setSelectedContactId(null);
-    
-    // Simulate loading
-    setLoading(true);
-    setError(null);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   };
 
-  const handleUpdate = () => {
-    if (selectedContactId) {
-      const contactToUpdate = contacts.find(c => c.id === selectedContactId);
-      if (contactToUpdate) {
-        setCurrentContact(contactToUpdate);
-        setShowForm(true);
-      } else {
-        setMessage({ type: 'warning', message: 'Please select a contact to update' });
-      }
-    } else {
+  const handleUpdate = async () => {
+    if (!selectedContactId) {
       setMessage({ type: 'warning', message: 'Please select a contact to update' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const contact = await contactService.getContactById(selectedContactId);
+      setCurrentContact(contact);
+      setShowForm(true);
+    } catch (err) {
+      setError('Failed to load the selected contact.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = () => {
-    if (selectedContactId) {
-      // Simulate deletion
-      setContacts(prev => prev.filter(contact => contact.id !== selectedContactId));
+  const handleDelete = async () => {
+    if (!selectedContactId) {
+      setMessage({ type: 'warning', message: 'Please select a contact to delete' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await contactService.deleteContact(selectedContactId);
       setMessage({ type: 'success', message: 'Contact deleted successfully' });
       setSelectedContactId(null);
-    } else {
-      setMessage({ type: 'warning', message: 'Please select a contact to delete' });
+      await fetchContacts();
+    } catch (err) {
+      setError('Failed to delete the contact.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleFormSubmit = (formData) => {
-    if (formData.id) {
-      // Update existing contact
-      setContacts(prev => 
-        prev.map(contact => 
-          contact.id === formData.id ? formData : contact
-        )
-      );
-      setMessage({ type: 'success', message: 'Contact updated successfully' });
-    } else {
-      // Create new contact
-      const newContact = {
-        ...formData,
-        id: contacts.length + 1, // Simple ID generation for demo purposes
-      };
-      setContacts(prev => [...prev, newContact]);
-      setMessage({ type: 'success', message: 'Contact created successfully' });
+  const handleFormSubmit = async (formData) => {
+    try {
+      setLoading(true);
+      if (formData.id) {
+        // Update
+        await contactService.updateContact(formData);
+        setMessage({ type: 'success', message: 'Contact updated successfully' });
+      } else {
+        // Create
+        await contactService.createContact(formData);
+        setMessage({ type: 'success', message: 'Contact created successfully' });
+      }
+      setShowForm(false);
+      setCurrentContact(null);
+      await fetchContacts();
+    } catch (err) {
+      setError('Failed to save the contact.');
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
-    setCurrentContact(null);
   };
 
   const handleFormCancel = () => {
@@ -125,41 +130,56 @@ const HomePage = () => {
     setSelectedContactId(id === selectedContactId ? null : id);
   };
 
-  // Test error message
-  const showTestError = () => {
-    setError("Failed to load contacts. Please try again.");
-    setMessage(null);
-  };
+  // Display message component
+  const MessageDisplay = ({ type, text }) => (
+    <div className={`mt-4 mb-4 p-4 rounded ${
+      type === 'error' ? 'bg-red-100 text-red-800' : 
+      type === 'success' ? 'bg-green-100 text-green-800' :
+      'bg-yellow-100 text-yellow-800'
+    }`}>
+      {text}
+    </div>
+  );
+
+  const currentUser = authService.getCurrentUser();
 
   return (
     <PageLayout title="Contact Management">
-<div className="flex flex-wrap gap-2 mb-6">
-  <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
-  <CrudButton type="read" onClick={handleRead} label="View Contacts" />
-  <CrudButton 
-  type="update" 
-  onClick={handleUpdate} 
-  label="Update Contact" 
-  disabled={!selectedContactId}
-/>
-<CrudButton 
-  type="delete" 
-  onClick={handleDelete} 
-  label="Delete Contact" 
-  disabled={!selectedContactId}
-/>
-  <CrudButton type="read" onClick={showTestError} label="Test Error" />
-</div>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap gap-2">
+          <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
+          <CrudButton type="read" onClick={handleRead} label="View Contacts" />
+          <CrudButton 
+            type="update" 
+            onClick={handleUpdate} 
+            label="Update Contact" 
+            disabled={!selectedContactId}
+          />
+          <CrudButton 
+            type="delete" 
+            onClick={handleDelete} 
+            label="Delete Contact" 
+            disabled={!selectedContactId}
+          />
+        </div>
+        
+        <div className="flex items-center">
+          <span className="text-gray-300 mr-4">
+            Logged in as: <strong>{currentUser?.username}</strong>
+          </span>
+          <button 
+            onClick={handleLogout}
+            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
       
       <hr className="my-6 border-gray-600" />
       
-      {message && (
-        <Message 
-          type={message.type} 
-          message={message.message} 
-          onClose={() => setMessage(null)} 
-        />
-      )}
+      {message && <MessageDisplay type={message.type} text={message.message} />}
+      {error && <MessageDisplay type="error" text={error} />}
       
       <div className="bg-gray-800 p-6 rounded-lg shadow-md">
         {showForm ? (
