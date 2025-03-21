@@ -17,6 +17,19 @@ const HomePage = () => {
   const [selectedContactId, setSelectedContactId] = useState(null);
   const navigate = useNavigate();
 
+
+  // In your existing HomePage.jsx, add this useEffect after your state declarations
+useEffect(() => {
+  // Check if user is authenticated
+  if (!authService.isAuthenticated()) {
+    navigate('/login');
+    return;
+  }
+  
+  // Load contacts
+  fetchContacts();
+}, [navigate]);
+
   // Check authentication and load contacts on mount
 // Modified useEffect in HomePage.jsx
 // Updated isAuthenticated function for api.js
