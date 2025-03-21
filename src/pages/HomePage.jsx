@@ -157,61 +157,69 @@ isAuthenticated: () => {
   const currentUser = authService.getCurrentUser();
 
   return (
-    <PageLayout title="Contact Management">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex flex-wrap gap-2">
-          <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
-          <CrudButton type="read" onClick={handleRead} label="View Contacts" />
-          <CrudButton 
-            type="update" 
-            onClick={handleUpdate} 
-            label="Update Contact" 
-            disabled={!selectedContactId}
-          />
-          <CrudButton 
-            type="delete" 
-            onClick={handleDelete} 
-            label="Delete Contact" 
-            disabled={!selectedContactId}
-          />
-        </div>
-        
-        <div className="flex items-center">
-          <span className="text-gray-300 mr-4">
-            Logged in as: <strong>{currentUser?.username}</strong>
-          </span>
-          <button 
-            onClick={handleLogout}
-            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-      
-      <hr className="my-6 border-gray-600" />
-      
-      {message && <MessageDisplay type={message.type} text={message.message} />}
-      {error && <MessageDisplay type="error" text={error} />}
-      
-      <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-        {showForm ? (
-          <ContactForm 
-            contact={currentContact} 
-            onSubmit={handleFormSubmit} 
-            onCancel={handleFormCancel} 
-          />
-        ) : (
-          <ContactsTable 
-            contacts={contacts} 
-            loading={loading} 
-            error={error}
-            selectedContactId={selectedContactId}
-            onSelectContact={handleSelectContact}
-          />
-        )}
-      </div>
-    </PageLayout>
+// In your HomePage.jsx, modify the top section:
+<PageLayout>
+  {/* Login in the upper right corner */}
+  <div className="flex justify-end">
+    <div className="flex items-center">
+      <span className="text-gray-300 mr-4">
+        Logged in as: <strong>{currentUser?.username}</strong>
+      </span>
+      <button 
+        onClick={handleLogout}
+        className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+  
+  {/* Title above the buttons with spacing */}
+  <h1 className="text-3xl font-bold text-white text-center mb-8">Contact Management</h1>
+  
+  {/* Center the buttons */}
+  <div className="flex justify-center mb-6">
+    <div className="flex flex-wrap gap-2">
+      <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
+      <CrudButton type="read" onClick={handleRead} label="View Contacts" />
+      <CrudButton 
+        type="update" 
+        onClick={handleUpdate} 
+        label="Update Contact" 
+        disabled={!selectedContactId}
+      />
+      <CrudButton 
+        type="delete" 
+        onClick={handleDelete} 
+        label="Delete Contact" 
+        disabled={!selectedContactId}
+      />
+    </div>
+  </div>
+  
+  <hr className="my-6 border-gray-600" />
+  
+  {message && <MessageDisplay type={message.type} text={message.message} />}
+  {error && <MessageDisplay type="error" text={error} />}
+  
+  <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+    {showForm ? (
+      <ContactForm 
+        contact={currentContact} 
+        onSubmit={handleFormSubmit} 
+        onCancel={handleFormCancel} 
+      />
+    ) : (
+      <ContactsTable 
+        contacts={contacts} 
+        loading={loading} 
+        error={error}
+        selectedContactId={selectedContactId}
+        onSelectContact={handleSelectContact}
+      />
+    )}
+  </div>
+</PageLayout>
   );
 };
 
