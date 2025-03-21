@@ -1,4 +1,4 @@
-// src/pages/LoginPage.jsx
+// src/pages/LoginPage.jsx (UPDATED VERSION)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
@@ -36,7 +36,7 @@ const LoginPage = () => {
       }, 100);
     } catch (err) {
       console.error('Login error:', err);
-      setError('Login failed. Please check your credentials.');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

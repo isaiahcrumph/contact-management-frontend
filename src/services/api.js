@@ -1,52 +1,53 @@
-// src/services/api.js
-import axios from 'axios';
+// src/services/api.js (UPDATED VERSION)
+import apiClient from './api-client';
 
-// Base API URL - update this with your actual API URL
-const API_URL = 'https://localhost:7091'; 
-
-// Create axios instance with base configuration
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Function to set auth token for subsequent requests
-export const setAuthToken = (token) => {
-  if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common['Authorization'];
-  }
-};
+// Export the apiClient so other services can use it
+export { default as apiClient } from './api-client';
 
 // Authentication service
 export const authService = {
-  login: async (username, password) => {
-    try {
-      const response = await apiClient.post('/api/auth/login', { username, password });
-      const token = response.data.token;
-      setAuthToken(token);
+// In src/services/api.js - update the login function
+// In src/services/api.js - update the login function
+login: async (username, password) => {
+  try {
+    console.log('Sending login request with:', { username, password });
+    const response = await apiClient.post('/api/auth/login', { username, password });
+    
+    // Check if the response.data is a string (token)
+    if (response.data && typeof response.data === 'string') {
+      // The response is the token itself
+      const token = response.data;
+      
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       localStorage.setItem('token', token);
+      
+      // Extract username from token payload (JWT)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // Store user info from token claims
       localStorage.setItem('user', JSON.stringify({
-        username: response.data.username,
-        role: response.data.role,
-        expiration: response.data.expiration
+        username: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || username,
+        role: payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'user',
+        expiration: payload.exp ? new Date(payload.exp * 1000).toISOString() : null
       }));
-      return response.data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      
+      return { token, user: { username, role: 'user' } };
+    } else {
+      console.error('Invalid response format:', response.data);
+      throw new Error('No token received from server');
     }
-  },
-  
+  } catch (error) {
+    console.error('Login error details:', error);
+    throw error;
+  }
+},
+ 
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setAuthToken(null);
+    delete apiClient.defaults.headers.common['Authorization'];
   },
-  
+ 
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -54,22 +55,26 @@ export const authService = {
     }
     return null;
   },
-  
+ 
   isAuthenticated: () => {
     const token = localStorage.getItem('token');
     if (!token) return false;
-    
+   
     // Check if token is expired
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const user = JSON.parse(userStr);
-      const expirationDate = new Date(user.expiration);
-      if (expirationDate > new Date()) {
-        return true;
+      if (user.expiration) {
+        const expirationDate = new Date(user.expiration);
+        if (expirationDate > new Date()) {
+          return true;
+        }
+      } else {
+        return true; // No expiration info, assume valid
       }
     }
-    
-    // Token expired, clear it
+   
+    // Token expired or no user info, clear it
     authService.logout();
     return false;
   }
@@ -86,7 +91,7 @@ export const contactService = {
       throw error;
     }
   },
-  
+ 
   getContactById: async (id) => {
     try {
       const response = await apiClient.get(`/api/v2/contacts/${id}`);
@@ -96,7 +101,7 @@ export const contactService = {
       throw error;
     }
   },
-  
+ 
   createContact: async (contactData) => {
     try {
       const response = await apiClient.post('/api/v2/contacts', contactData);
@@ -106,7 +111,7 @@ export const contactService = {
       throw error;
     }
   },
-  
+ 
   updateContact: async (contactData) => {
     try {
       const response = await apiClient.put(`/api/v2/contacts/${contactData.id}`, contactData);
@@ -116,7 +121,7 @@ export const contactService = {
       throw error;
     }
   },
-  
+ 
   deleteContact: async (id) => {
     try {
       await apiClient.delete(`/api/v2/contacts/${id}`);
@@ -131,7 +136,7 @@ export const contactService = {
 // Initialize auth token from localStorage on page load
 const token = localStorage.getItem('token');
 if (token) {
-  setAuthToken(token);
+  apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 export default apiClient;
