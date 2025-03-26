@@ -1,9 +1,8 @@
-// src/components/modals/ContactDetailsModal.jsx
 import React from 'react';
 
 const ContactDetailsModal = ({ contact, onClose }) => {
   if (!contact) return null;
-  
+ 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-lg w-full">
@@ -15,28 +14,25 @@ const ContactDetailsModal = ({ contact, onClose }) => {
             </svg>
           </button>
         </div>
-        
+       
         <div className="grid grid-cols-2 gap-4">
-  <div className="col-span-2">
-    <p className="text-gray-400 text-sm">Name</p>
-    <p className="text-white">{`${contact.firstName} ${contact.lastName}`}</p>
-  </div>
-  <div>
-    <p className="text-gray-400 text-sm">Email</p>
-    <p className="text-white">{contact.email}</p>
-  </div>
-          
+          {/* Full Name Section */}
+          <div className="col-span-2 border-b border-gray-700 pb-3 mb-2">
+            <p className="text-gray-400 text-sm">Full Name</p>
+            <p className="text-white text-lg font-medium">{`${contact.firstName || ''} ${contact.lastName || ''}`}</p>
+          </div>
+
           <div>
             <p className="text-gray-400 text-sm">Email</p>
             <p className="text-white">{contact.email}</p>
           </div>
           <div>
-             <p className="text-gray-400 text-sm">Phone</p>
+            <p className="text-gray-400 text-sm">Phone</p>
             <p className="text-white">{contact.phoneNumber}</p>
           </div>
           <div className="col-span-2">
             <p className="text-gray-400 text-sm">Address</p>
-            <p className="text-white">{contact.address}</p>
+            <p className="text-white">{contact.address || 'No address provided'}</p>
           </div>
           <div>
             <p className="text-gray-400 text-sm">City</p>
@@ -51,10 +47,10 @@ const ContactDetailsModal = ({ contact, onClose }) => {
             <p className="text-white">{contact.zipCode}</p>
           </div>
         </div>
-        
+       
         <div className="mt-6 flex justify-end">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
             Close
