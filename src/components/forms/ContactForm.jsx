@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 const ContactForm = ({ contact, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     id: null,
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phoneNumber: '',
     address: '',
@@ -18,7 +19,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     if (contact) {
       setFormData({
         id: contact.id || null,
-        name: contact.name || '',
+        firstName: contact.firstName || '',
+        lastName: contact.lastName || '',
         email: contact.email || '',
         phoneNumber: contact.phoneNumber || '',
         address: contact.address || '',
@@ -53,7 +55,14 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
   const validate = () => {
     const newErrors = {};
     
-    if (!formData.name) newErrors.name = 'Name is required';
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    else if (!/^[A-Za-z\s'-]+$/.test(formData.firstName)) 
+      newErrors.firstName = 'First name should contain only letters, spaces, hyphens, and apostrophes';
+    
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    else if (!/^[A-Za-z\s'-]+$/.test(formData.lastName)) 
+      newErrors.lastName = 'Last name should contain only letters, spaces, hyphens, and apostrophes';
+    
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     
@@ -85,19 +94,37 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-xl font-bold">{formData.id ? 'Edit Contact' : 'Create Contact'}</h2>
       
-      <div>
-        <label htmlFor="name" className="block mb-1">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-          aria-describedby={errors.name ? "name-error" : ""}
-        />
-        {errors.name && <p id="name-error" className="text-red-500 mt-1">{errors.name}</p>}
-      </div>
+      {/* First Name field */}
+<div>
+  <label htmlFor="firstName" className="block mb-1">First Name</label>
+  <input
+    type="text"
+    id="firstName"
+    name="firstName"
+    value={formData.firstName}
+    onChange={handleChange}
+    placeholder="John"
+    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+    aria-describedby={errors.firstName ? "firstName-error" : ""}
+  />
+  {errors.firstName && <p id="firstName-error" className="text-red-500 mt-1">{errors.firstName}</p>}
+</div>
+
+{/* Last Name field */}
+<div>
+  <label htmlFor="lastName" className="block mb-1">Last Name</label>
+  <input
+    type="text"
+    id="lastName"
+    name="lastName"
+    value={formData.lastName}
+    onChange={handleChange}
+    placeholder="Smith"
+    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+    aria-describedby={errors.lastName ? "lastName-error" : ""}
+  />
+  {errors.lastName && <p id="lastName-error" className="text-red-500 mt-1">{errors.lastName}</p>}
+</div>
       
       <div>
         <label htmlFor="email" className="block mb-1">Email</label>
@@ -107,6 +134,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           name="email"
           value={formData.email}
           onChange={handleChange}
+          placeholder="FirstLast@example.com"
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
           aria-describedby={errors.email ? "email-error" : ""}
         />
@@ -136,6 +164,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           name="address"
           value={formData.address}
           onChange={handleChange}
+          placeholder="123 Main Street"
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
@@ -149,6 +178,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
             name="city"
             value={formData.city}
             onChange={handleChange}
+            placeholder="Seattle"
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
             aria-describedby={errors.city ? "city-error" : ""}
           />

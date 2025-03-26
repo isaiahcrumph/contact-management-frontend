@@ -43,14 +43,11 @@ const ContactsTable = ({ contacts, loading, error, selectedContactId, onSelectCo
                 selectedContactId === contact.id ? 'bg-blue-900' : 'bg-gray-800'
               }`}
               onClick={() => onSelectContact(contact.id)}
-              onDoubleClick={() => {
-                console.log("Double-click detected on row", contact.id);
-                if (onViewContact) {
-                  onViewContact(contact.id);
-                }
-              }}
+              onDoubleClick={() => onViewContact(contact.id)}
             >
-              <td className="py-4 px-6 font-medium whitespace-nowrap">{contact.name}</td>
+              <td className="py-4 px-6 font-medium whitespace-nowrap">
+                {contact.firstName} {contact.lastName}
+              </td>
               <td className="py-4 px-6">{contact.email}</td>
               <td className="py-4 px-6">{contact.phoneNumber}</td>
               <td className="py-4 px-6">{contact.city}</td>

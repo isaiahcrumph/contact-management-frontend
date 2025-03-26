@@ -24,6 +24,9 @@ const HomePage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 
+  
+
+
   // In your existing HomePage.jsx, add this useEffect after your state declarations
 useEffect(() => {
   // Check if user is authenticated
@@ -139,28 +142,46 @@ isAuthenticated: () => {
   };
 
   // Sort contacts based on current sort settings
-const getSortedContacts = () => {
-  return [...contacts].sort((a, b) => {
-    const fieldA = a[sortField] || '';
-    const fieldB = b[sortField] || '';
-    
-    // Handle string sorting
-    if (typeof fieldA === 'string' && typeof fieldB === 'string') {
-      if (sortDirection === 'asc') {
-        return fieldA.localeCompare(fieldB);
-      } else {
-        return fieldB.localeCompare(fieldA);
+  const getSortedContacts = () => {
+    return [...contacts].sort((a, b) => {
+      // Special handling for name field to sort by last name first
+      if (sortField === 'name') {
+        // Sort by lastName, then by firstName
+        const lastNameCompare = sortDirection === 'asc' 
+          ? a.lastName.localeCompare(b.lastName)
+          : b.lastName.localeCompare(a.lastName);
+          
+        // If last names are the same, sort by first name
+        if (lastNameCompare === 0) {
+          return sortDirection === 'asc'
+            ? a.firstName.localeCompare(b.firstName)
+            : b.firstName.localeCompare(a.firstName);
+        }
+        
+        return lastNameCompare;
       }
-    }
-    
-    // Handle numeric sorting
-    if (sortDirection === 'asc') {
-      return fieldA - fieldB;
-    } else {
-      return fieldB - fieldA;
-    }
-  });
-};
+      
+      // For other fields, use standard sorting
+      const fieldA = a[sortField] || '';
+      const fieldB = b[sortField] || '';
+      
+      // Handle string sorting
+      if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+        if (sortDirection === 'asc') {
+          return fieldA.localeCompare(fieldB);
+        } else {
+          return fieldB.localeCompare(fieldA);
+        }
+      }
+      
+      // Handle numeric sorting
+      if (sortDirection === 'asc') {
+        return fieldA - fieldB;
+      } else {
+        return fieldB - fieldA;
+      }
+    });
+  };
 
 const handleSort = (field) => {
   // If clicking same field, toggle direction
@@ -223,6 +244,7 @@ const handleSort = (field) => {
     }
   };
 
+  
 
 
   // Display message component
@@ -313,6 +335,43 @@ const handleSort = (field) => {
   {error && <MessageDisplay type="error" text={error} />}
   
   <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+
+  {!showForm && (
+  <div className="flex justify-end mb-4">
+    <div className="flex items-center">
+      <label htmlFor="sort-field" className="text-gray-300 mr-2">Sort by:</label>
+      <select
+        id="sort-field"
+        value={sortField}
+        onChange={(e) => setSortField(e.target.value)}
+        className="bg-gray-700 text-white px-3 py-2 rounded mr-2"
+      >
+        <option value="name">Name</option>
+        <option value="email">Email</option>
+        <option value="phoneNumber">Phone</option>
+        <option value="city">City</option>
+        <option value="state">State</option>
+      </select>
+      
+      <button
+        onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+        className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded flex items-center"
+        title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+      >
+        {sortDirection === 'asc' ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        )}
+      </button>
+    </div>
+  </div>
+)}
+
     {showForm ? (
       <ContactForm 
         contact={currentContact} 
@@ -320,6 +379,8 @@ const handleSort = (field) => {
         onCancel={handleFormCancel} 
       />
     ) : (
+
+      
       <ContactsTable 
   contacts={getSortedContacts()} 
   loading={loading} 
