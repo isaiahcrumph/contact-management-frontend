@@ -36,25 +36,32 @@ const ContactsTable = ({ contacts, loading, error, selectedContactId, onSelectCo
           </tr>
         </thead>
         <tbody>
-          {contacts.map((contact, index) => (
-            <tr
-              key={contact.id || index}
-              className={`border-b border-gray-700 hover:bg-gray-600 cursor-pointer ${
-                selectedContactId === contact.id ? 'bg-blue-900' : 'bg-gray-800'
-              }`}
-              onClick={() => onSelectContact(contact.id)}
-              onDoubleClick={() => onViewContact(contact.id)}
-            >
-              <td className="py-4 px-6 font-medium whitespace-nowrap">
-                {contact.firstName} {contact.lastName}
-              </td>
-              <td className="py-4 px-6">{contact.email}</td>
-              <td className="py-4 px-6">{contact.phoneNumber}</td>
-              <td className="py-4 px-6">{contact.city}</td>
-              <td className="py-4 px-6">{contact.state}</td>
-              <td className="py-4 px-6">{contact.zipCode}</td>
-            </tr>
-          ))}
+        {contacts
+  .filter(contact =>
+    `${contact.firstName} ${contact.lastName} ${contact.email}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  )
+  .map((contact, index) => (
+    <tr
+      key={contact.id || index}
+      className={`border-b border-gray-700 hover:bg-gray-600 cursor-pointer ${
+        selectedContactId === contact.id ? 'bg-blue-900' : 'bg-gray-800'
+      }`}
+      onClick={() => onSelectContact(contact.id)}
+      onDoubleClick={() => onViewContact(contact.id)}
+    >
+      <td className="py-4 px-6 font-medium whitespace-nowrap">
+        {contact.firstName} {contact.lastName}
+      </td>
+      <td className="py-4 px-6">{contact.email}</td>
+      <td className="py-4 px-6">{contact.phoneNumber}</td>
+      <td className="py-4 px-6">{contact.city}</td>
+      <td className="py-4 px-6">{contact.state}</td>
+      <td className="py-4 px-6">{contact.zipCode}</td>
+    </tr>
+  ))}
+
         </tbody>
       </table>
     </div>
