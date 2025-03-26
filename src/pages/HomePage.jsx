@@ -19,6 +19,9 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [viewingContact, setViewingContact] = useState(null);
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 
   // In your existing HomePage.jsx, add this useEffect after your state declarations
@@ -110,17 +113,23 @@ isAuthenticated: () => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!selectedContactId) {
       setMessage({ type: 'warning', message: 'Please select a contact to delete' });
       return;
     }
-
+  
+    // Show confirmation dialog instead of deleting immediately
+    setShowDeleteConfirm(true);
+  };
+  
+  const confirmDelete = async () => {
     try {
       setLoading(true);
       await contactService.deleteContact(selectedContactId);
       setMessage({ type: 'success', message: 'Contact deleted successfully' });
       setSelectedContactId(null);
+      setShowDeleteConfirm(false);
       await fetchContacts();
     } catch (err) {
       setError('Failed to delete the contact.');
@@ -128,6 +137,41 @@ isAuthenticated: () => {
       setLoading(false);
     }
   };
+
+  // Sort contacts based on current sort settings
+const getSortedContacts = () => {
+  return [...contacts].sort((a, b) => {
+    const fieldA = a[sortField] || '';
+    const fieldB = b[sortField] || '';
+    
+    // Handle string sorting
+    if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+      if (sortDirection === 'asc') {
+        return fieldA.localeCompare(fieldB);
+      } else {
+        return fieldB.localeCompare(fieldA);
+      }
+    }
+    
+    // Handle numeric sorting
+    if (sortDirection === 'asc') {
+      return fieldA - fieldB;
+    } else {
+      return fieldB - fieldA;
+    }
+  });
+};
+
+const handleSort = (field) => {
+  // If clicking same field, toggle direction
+  if (field === sortField) {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  } else {
+    // New field, default to ascending
+    setSortField(field);
+    setSortDirection('asc');
+  }
+};
 
   const handleFormSubmit = async (formData) => {
     try {
@@ -179,6 +223,8 @@ isAuthenticated: () => {
     }
   };
 
+
+
   // Display message component
   const MessageDisplay = ({ type, text }) => (
     <div className={`mt-4 mb-4 p-4 rounded ${
@@ -213,39 +259,53 @@ isAuthenticated: () => {
   {/* Title above the buttons with spacing */}
   <h1 className="text-3xl font-bold text-white text-center mb-8">Contact Management</h1>
   
-  {/* Center the buttons */}
-  <div className="flex justify-center mb-6">
-    <div className="flex flex-wrap gap-2">
-      <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
-      <CrudButton type="read" onClick={handleRead} label="View Contacts" />
-      <CrudButton 
-        type="update" 
-        onClick={handleUpdate} 
-        label="Update Contact" 
-        disabled={!selectedContactId}
-      />
-      <CrudButton 
-        type="delete" 
-        onClick={handleDelete} 
-        label="Delete Contact" 
-        disabled={!selectedContactId}
-      />
-      {/* Add this right after your CrudButtons */}
-<div className="flex justify-center mt-4">
-  <button 
-    onClick={() => {
-      console.log("Test button clicked");
-      if (contacts.length > 0) {
-        handleViewContact(contacts[0].id);
-      }
-    }}
-    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-  >
-    Test View First Contact
-  </button>
-</div>
+{/* Button area */}
+<div className="flex justify-center mb-6">
+  {currentUser?.role === 'Admin' ? (
+    <div className="w-full">
+      <div className="flex justify-center gap-2">
+        <CrudButton type="create" onClick={handleCreate} label="Create Contact" />
+        <CrudButton 
+          type="update" 
+          onClick={handleUpdate} 
+          label="Update Contact" 
+          disabled={!selectedContactId}
+        />
+        <CrudButton 
+          type="delete" 
+          onClick={handleDelete} 
+          label="Delete Contact" 
+          disabled={!selectedContactId}
+        />
+      </div>
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={handleRead}
+          className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded"
+          title="Refresh Contacts"
+        >
+          {/* SVG Refresh Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
     </div>
-  </div>
+  ) : (
+    <div className="w-full flex justify-end">
+      <button
+        onClick={handleRead}
+        className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded"
+        title="Refresh Contacts"
+      >
+        {/* SVG Refresh Icon */}
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
+    </div>
+  )}
+</div>
   
   <hr className="my-6 border-gray-600" />
   
@@ -261,13 +321,16 @@ isAuthenticated: () => {
       />
     ) : (
       <ContactsTable 
-        contacts={contacts} 
-        loading={loading} 
-        error={error}
-        selectedContactId={selectedContactId}
-        onSelectContact={handleSelectContact}
-        onViewContact={handleViewContact}
-      />
+  contacts={getSortedContacts()} 
+  loading={loading} 
+  error={error}
+  selectedContactId={selectedContactId}
+  onSelectContact={handleSelectContact}
+  onViewContact={handleViewContact}
+  onSort={handleSort}
+  sortField={sortField}
+  sortDirection={sortDirection}
+/>
     )}
   </div>
 {/* Add the modal */}
@@ -277,6 +340,33 @@ isAuthenticated: () => {
         onClose={() => setShowDetailsModal(false)}
       />
     )}
+
+{/* Delete Confirmation Dialog */}
+{showDeleteConfirm && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
+      <h2 className="text-xl font-semibold text-white mb-4">Confirm Delete</h2>
+      <p className="text-gray-300 mb-6">Are you sure you want to delete this contact? <br/> <br/>This action cannot be undone.</p>
+      
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => setShowDeleteConfirm(false)}
+          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
   </PageLayout>
 );
 };
