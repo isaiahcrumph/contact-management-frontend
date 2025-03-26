@@ -17,6 +17,15 @@ const ContactDetailsModal = ({ contact, onClose }) => {
         </div>
         
         <div className="grid grid-cols-2 gap-4">
+  <div className="col-span-2">
+    <p className="text-gray-400 text-sm">Name</p>
+    <p className="text-white">{`${contact.firstName} ${contact.lastName}`}</p>
+  </div>
+  <div>
+    <p className="text-gray-400 text-sm">Email</p>
+    <p className="text-white">{contact.email}</p>
+  </div>
+          
           <div>
             <p className="text-gray-400 text-sm">Email</p>
             <p className="text-white">{contact.email}</p>

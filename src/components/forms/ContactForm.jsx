@@ -43,7 +43,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
   const fillDummyData = () => {
     setFormData({
       id: null,
-      name: `Test User ${Math.floor(Math.random() * 100)}`,
+      firstName: `Test${Math.floor(Math.random() * 100)}`,
+      lastName: `User${Math.floor(Math.random() * 100)}`,
       email: `test${Math.floor(Math.random() * 100)}@example.com`,
       phoneNumber: `555-${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
       address: `${Math.floor(Math.random() * 9000) + 1000} Main Street`,
@@ -55,41 +56,65 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
   const validate = () => {
     const newErrors = {};
     
-    if (!formData.firstName) newErrors.firstName = 'First name is required';
-    else if (!/^[A-Za-z\s'-]+$/.test(formData.firstName)) 
-      newErrors.firstName = 'First name should contain only letters, spaces, hyphens, and apostrophes';
+    // First name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters';
+    } else if (!/^[A-Za-z\s'-]+$/.test(formData.firstName)) {
+      newErrors.firstName = 'First name can only contain letters, spaces, hyphens and apostrophes';
+    }
     
-    if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    else if (!/^[A-Za-z\s'-]+$/.test(formData.lastName)) 
-      newErrors.lastName = 'Last name should contain only letters, spaces, hyphens, and apostrophes';
+    // Last name validation
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'Last name must be at least 2 characters';
+    } else if (!/^[A-Za-z\s'-]+$/.test(formData.lastName)) {
+      newErrors.lastName = 'Last name can only contain letters, spaces, hyphens and apostrophes';
+    }
     
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    // Email validation - Using more robust regex
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address (example@domain.com)';
+    }
     
-    if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
-    else if (!/^\d{3}-\d{3}-\d{4}$/.test(formData.phoneNumber)) 
-      newErrors.phoneNumber = 'Phone number must be in format: 555-123-4567';
+    // Phone validation
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    } else if (!/^\d{3}-\d{3}-\d{4}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please use format: 555-123-4567';
+    }
     
-    if (!formData.city) newErrors.city = 'City is required';
-    if (!formData.state) newErrors.state = 'State is required';
-    else if (!/^[A-Z]{2}$/.test(formData.state)) 
-      newErrors.state = 'State must be 2 uppercase letters (e.g., WA)';
+    // Address is optional in many systems, but you can add validation if needed
     
-    if (!formData.zipCode) newErrors.zipCode = 'ZIP Code is required';
-    else if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode)) 
-      newErrors.zipCode = 'ZIP Code must be 5 digits or 5+4 digits format';
+    // City validation
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
+    } else if (!/^[A-Za-z\s'-]+$/.test(formData.city)) {
+      newErrors.city = 'City name can only contain letters, spaces, hyphens and apostrophes';
+    }
+    
+    // State validation
+    if (!formData.state.trim()) {
+      newErrors.state = 'State is required';
+    } else if (!/^[A-Z]{2}$/.test(formData.state)) {
+      newErrors.state = 'Please enter a valid 2-letter state code (e.g., WA)';
+    }
+    
+    // ZIP Code validation
+    if (!formData.zipCode.trim()) {
+      newErrors.zipCode = 'ZIP Code is required';
+    } else if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode)) {
+      newErrors.zipCode = 'Please enter a valid 5-digit ZIP code or ZIP+4';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      onSubmit(formData);
-    }
-  };
-
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-xl font-bold">{formData.id ? 'Edit Contact' : 'Create Contact'}</h2>
