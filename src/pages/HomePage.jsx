@@ -6,6 +6,7 @@ import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
 import { contactService, authService } from '../services/api';
+import ContactDetailsModal from '../components/modals/ContactDetailsModal';
 
 const HomePage = () => {
   const [contacts, setContacts] = useState([]);
@@ -16,6 +17,8 @@ const HomePage = () => {
   const [currentContact, setCurrentContact] = useState(null);
   const [selectedContactId, setSelectedContactId] = useState(null);
   const navigate = useNavigate();
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [viewingContact, setViewingContact] = useState(null);
 
 
   // In your existing HomePage.jsx, add this useEffect after your state declarations
@@ -25,10 +28,24 @@ useEffect(() => {
     navigate('/login');
     return;
   }
-  
+
   // Load contacts
   fetchContacts();
 }, [navigate]);
+
+// Add this useEffect in your HomePage.jsx
+// Place it near your other useEffect hooks
+useEffect(() => {
+  // If there's a message showing, set a timer to clear it
+  if (message) {
+    const timer = setTimeout(() => {
+      setMessage(null);
+    }, 3000); // Message will disappear after 3 seconds
+    
+    // Clean up the timer when component unmounts or message changes
+    return () => clearTimeout(timer);
+  }
+}, [message]); // This effect runs whenever message changes
 
   // Check authentication and load contacts on mount
 // Modified useEffect in HomePage.jsx
@@ -128,7 +145,8 @@ isAuthenticated: () => {
       setCurrentContact(null);
       await fetchContacts();
     } catch (err) {
-      setError('Failed to save the contact.');
+      // Use our enhanced error messages from the API service
+      setError(err.userMessage || 'Failed to save the contact.');
     } finally {
       setLoading(false);
     }
@@ -140,7 +158,25 @@ isAuthenticated: () => {
   };
 
   const handleSelectContact = (id) => {
+    // Just handle row selection, no fetching details
     setSelectedContactId(id === selectedContactId ? null : id);
+  };
+
+  const handleViewContact = async (id) => {
+    console.log("handleViewContact called with id:", id);
+    try {
+      setLoading(true);
+      console.log("Fetching contact details...");
+      const contact = await contactService.getContactById(id);
+      console.log("Fetched contact:", contact);
+      setViewingContact(contact);
+      setShowDetailsModal(true);
+    } catch (err) {
+      console.error("Error fetching contact:", err);
+      setError('Failed to load contact details.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Display message component
@@ -194,6 +230,20 @@ isAuthenticated: () => {
         label="Delete Contact" 
         disabled={!selectedContactId}
       />
+      {/* Add this right after your CrudButtons */}
+<div className="flex justify-center mt-4">
+  <button 
+    onClick={() => {
+      console.log("Test button clicked");
+      if (contacts.length > 0) {
+        handleViewContact(contacts[0].id);
+      }
+    }}
+    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+  >
+    Test View First Contact
+  </button>
+</div>
     </div>
   </div>
   
@@ -216,11 +266,19 @@ isAuthenticated: () => {
         error={error}
         selectedContactId={selectedContactId}
         onSelectContact={handleSelectContact}
+        onViewContact={handleViewContact}
       />
     )}
   </div>
-</PageLayout>
-  );
+{/* Add the modal */}
+{showDetailsModal && (
+      <ContactDetailsModal 
+        contact={viewingContact}
+        onClose={() => setShowDetailsModal(false)}
+      />
+    )}
+  </PageLayout>
+);
 };
 
 export default HomePage;

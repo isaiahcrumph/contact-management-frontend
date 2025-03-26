@@ -37,6 +37,19 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     }));
   };
 
+
+  const fillDummyData = () => {
+    setFormData({
+      id: null,
+      name: `Test User ${Math.floor(Math.random() * 100)}`,
+      email: `test${Math.floor(Math.random() * 100)}@example.com`,
+      phoneNumber: `555-${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+      address: `${Math.floor(Math.random() * 9000) + 1000} Main Street`,
+      city: 'Seattle',
+      state: 'WA',
+      zipCode: '98101'
+    });
+  };
   const validate = () => {
     const newErrors = {};
     
