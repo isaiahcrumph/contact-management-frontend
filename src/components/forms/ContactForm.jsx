@@ -19,7 +19,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
   useEffect(() => {
     if (contact) {
       setFormData({
-        id: contact.id || null,
+        id: contact.id || 0,
         firstName: contact.firstName || '',
         lastName: contact.lastName || '',
         email: contact.email || '',
@@ -165,7 +165,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
     
     const dummyData = {
-      id: null,
+      id: 0,
       firstName: randomFirst,
       lastName: randomLast,
       email: `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}@example.com`,
@@ -179,7 +179,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     setFormData(dummyData);
     
     // Clear all errors since dummy data is valid
-    setErrors({});
+    //setErrors({});
     
     // Mark all fields as touched
     const allTouched = {};
