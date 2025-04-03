@@ -266,20 +266,10 @@ const handleSort = (field) => {
   {/* Login in the upper right corner */}
   <div className="flex justify-end">
     <div className="flex items-center">
-      <span className="text-gray-300 mr-4">
-        Logged in as: <strong>{currentUser?.username}</strong>
-      </span>
-      <button 
-        onClick={handleLogout}
-        className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
-      >
-        Logout
-      </button>
+      
     </div>
   </div>
-  
-  {/* Title above the buttons with spacing */}
-  <h1 className="text-3xl font-bold text-white text-center mb-8">Contact Management</h1>
+
   
 {/* Button area */}
 <div className="flex justify-center mb-6">

@@ -259,15 +259,6 @@ const EmptyContactsPage = () => {
       {/* Login in the upper right corner */}
       <div className="flex justify-end">
         <div className="flex items-center">
-          <span className="text-gray-300 mr-4">
-            Logged in as: <strong>{currentUser?.username}</strong>
-          </span>
-          <button 
-            onClick={handleLogout}
-            className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600"
-          >
-            Logout
-          </button>
         </div>
       </div>
       
