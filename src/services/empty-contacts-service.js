@@ -1,115 +1,64 @@
-// src/services/empty-contacts-service.js
-import api from './api-client';
+// src/services/emptyContacts-service.js
+import apiClient from './api-client';
 
-const ENDPOINT = '/api/v2/emptycontacts';
+// You can choose which API version to use
+const API_VERSION = 'v1';
 
-// Get all empty contacts
-export const getAllEmptyContacts = async () => {
-  try {
-    const response = await api.get(ENDPOINT);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching empty contacts:', error);
-    throw {
-      message: 'Failed to load contacts',
-      userMessage: 'Unable to load contacts. Please try again.',
-      error
-    };
+const contactsService = {
+  // Get all emptyContacts
+  getEmptyContacts: async () => {
+    try {
+      const response = await apiClient.get(`/${API_VERSION}/emptyContacts`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching empty contacts:', error);
+      throw error;
+    }
+  },
+  
+  // Get a single empty contact by ID
+  getEmptyContact: async (id) => {
+    try {
+      const response = await apiClient.get(`/${API_VERSION}/emptyContacts/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching empty contact ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  // Create a new empty contact
+  createEmptyContact: async (emptyContactData) => {
+    try {
+      const response = await apiClient.post(`/${API_VERSION}/emptyContacts`, emptyContactData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating empty contact:', error);
+      throw error;
+    }
+  },
+  
+  // Update an existing empty contact
+  updateEmptyContact: async (id, emptyContactData) => {
+    try {
+      const response = await apiClient.put(`/${API_VERSION}/emptyContacts/${id}`, emptyContactData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating empty contact ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  // Delete a empty contact
+  deleteEmptyContact: async (id) => {
+    try {
+      const response = await apiClient.delete(`/${API_VERSION}/emptyContacts/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting empty contact ${id}:`, error);
+      throw error;
+    }
   }
 };
 
-// Get a specific empty contact by ID
-export const getEmptyContactById = async (id) => {
-  try {
-    const response = await api.get(`${ENDPOINT}/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching empty contact with id ${id}:`, error);
-    throw {
-      message: `Failed to get contact with ID: ${id}`,
-      userMessage: 'Unable to load contact details. Please try again.',
-      error
-    };
-  }
-};
-
-// Create a new empty contact
-export const createEmptyContact = async (contact) => {
-  try {
-    const response = await api.post(ENDPOINT, contact);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating empty contact:', error);
-    throw {
-      message: 'Failed to create contact',
-      userMessage: 'Unable to create contact. Please check your form and try again.',
-      error
-    };
-  }
-};
-
-// Update an existing empty contact
-export const updateEmptyContact = async (contact) => {
-  try {
-    const response = await api.put(`${ENDPOINT}/${contact.id}`, contact);
-    return response.data;
-  } catch (error) {
-    console.error(`Error updating empty contact with id ${contact.id}:`, error);
-    throw {
-      message: `Failed to update contact with ID: ${contact.id}`,
-      userMessage: 'Unable to update contact. Please check your form and try again.',
-      error
-    };
-  }
-};
-
-// Delete an empty contact
-export const deleteEmptyContact = async (id) => {
-  try {
-    const response = await api.delete(`${ENDPOINT}/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting empty contact with id ${id}:`, error);
-    throw {
-      message: `Failed to delete contact with ID: ${id}`,
-      userMessage: 'Unable to delete contact. Please try again.',
-      error
-    };
-  }
-};
-
-// Search empty contacts
-export const searchEmptyContacts = async (query) => {
-  try {
-    const response = await api.get(`${ENDPOINT}/search?query=${encodeURIComponent(query)}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error searching empty contacts with query "${query}":`, error);
-    throw {
-      message: 'Failed to search contacts',
-      userMessage: 'Unable to search contacts. Please try again.',
-      error
-    };
-  }
-};
-
-// Get filtered and sorted empty contacts
-export const getFilteredEmptyContacts = async (filters) => {
-  try {
-    // Build query string from filters
-    const queryParams = Object.entries(filters)
-      .filter(([_, value]) => value !== null && value !== undefined && value !== '')
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-      .join('&');
-
-    const response = await api.get(`${ENDPOINT}?${queryParams}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching filtered empty contacts:', error);
-    throw {
-      message: 'Failed to load filtered contacts',
-      userMessage: 'Unable to load contacts with the specified filters. Please try again.',
-      error
-    };
-  }
-};
+export default contactsService;

@@ -6,7 +6,7 @@ import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
 import { contactService, authService } from '../services/api';
-import ContactDetailsModal from '../components/modals/ContactDetailsModal';
+import ContactDetailsModal from '../components/models/ContactDetailsModal';
 
 const HomePage = () => {
   const [contacts, setContacts] = useState([]);

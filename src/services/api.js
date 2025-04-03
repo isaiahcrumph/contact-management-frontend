@@ -102,46 +102,46 @@ export const contactService = {
     }
   },
  
-  createContact: async (contactData) => {
-    try {
-      const { id, ...contactWithoutId } = contactData;
-      const response = await apiClient.post('/api/v2/contacts', contactWithoutId);
-      return response.data;
-    } catch (error) {
-      // Improved error handling with user-friendly messages
-      let errorMessage = 'Failed to create contact. Please try again.';
+createContact: async (contactData) => {
+  try {
+    const { id, ...contactWithoutId } = contactData;
+    const response = await apiClient.post('/api/v2/contacts', contactWithoutId);
+    return response.data;
+  } catch (error) {
+    // Improved error handling with user-friendly messages
+    let errorMessage = 'Failed to create contact. Please try again.';
+    
+    if (error.response) {
+      console.error('API Error Response:', error.response.data);
       
-      if (error.response) {
-        console.error('API Error Response:', error.response.data);
+      // Customize message based on status codes
+      if (error.response.status === 400) {
+        errorMessage = 'The contact information is invalid. Please check all fields.';
         
-        // Customize message based on status codes
-        if (error.response.status === 400) {
-          errorMessage = 'The contact information is invalid. Please check all fields.';
+        // If we have detailed validation errors, include them
+        if (error.response.data?.errors) {
+          const errorDetails = Object.entries(error.response.data.errors)
+            .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+            .join('; ');
           
-          // If we have detailed validation errors, include them
-          if (error.response.data?.errors) {
-            const errorDetails = Object.entries(error.response.data.errors)
-              .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
-              .join('; ');
-            
-            errorMessage = `Validation errors: ${errorDetails}`;
-          }
-        } else if (error.response.status === 401) {
-          errorMessage = 'You need to log in again to continue.';
-        } else if (error.response.status === 403) {
-          errorMessage = 'You don\'t have permission to create contacts.';
-        } else if (error.response.status === 500) {
-          errorMessage = 'Server error occurred. Please try again later.';
+          errorMessage = `Validation errors: ${errorDetails}`;
         }
-      } else if (error.request) {
-        errorMessage = 'Could not connect to the server. Please check your internet connection.';
+      } else if (error.response.status === 401) {
+        errorMessage = 'You need to log in again to continue.';
+      } else if (error.response.status === 403) {
+        errorMessage = 'You don\'t have permission to create contacts.';
+      } else if (error.response.status === 500) {
+        errorMessage = 'Server error occurred. Please try again later.';
       }
-      
-      // Attach the parsed error message to the error object
-      error.userMessage = errorMessage;
-      throw error;
+    } else if (error.request) {
+      errorMessage = 'Could not connect to the server. Please check your internet connection.';
     }
-  },
+    
+    // Attach the parsed error message to the error object
+    error.userMessage = errorMessage;
+    throw error;
+  }
+},
  
   updateContact: async (contactData) => {
     try {

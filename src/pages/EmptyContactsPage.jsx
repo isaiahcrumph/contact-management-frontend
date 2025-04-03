@@ -6,8 +6,8 @@ import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
 import { authService } from '../services/api';
-import ContactDetailsModal from '../components/modals/ContactDetailsModal';
-import * as emptyContactService from '../services/empty-contacts-service';
+import ContactDetailsModal from '../components/models/ContactDetailsModal';
+import * as emptyContactService from '../services/NOT IN USE empty-contacts-service';
 
 const EmptyContactsPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -52,11 +52,25 @@ const EmptyContactsPage = () => {
     try {
       setLoading(true);
       const data = await emptyContactService.getAllEmptyContacts();
-      setContacts(Array.isArray(data) ? data : (data.contacts || []));
-      setError(null);
+      
+      // Check if the result has the isEmpty flag
+      if (data && data.isEmpty) {
+        setContacts([]);
+        setError(null);
+      } else {
+        setContacts(Array.isArray(data) ? data : (data.contacts || []));
+        setError(null);
+      }
     } catch (err) {
-      setError('Failed to load empty contacts. Please try again.');
+      console.error('Error fetching contacts:', err);
       setContacts([]);
+      
+      // Check if it's an access error
+      if (err.isAccessError) {
+        setError('Cannot connect to the database. Please try again later.');
+      } else {
+        setError('Error loading contacts. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
