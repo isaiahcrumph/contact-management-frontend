@@ -263,14 +263,9 @@ const handleSort = (field) => {
   return (
 // In your HomePage.jsx, modify the top section:
 <PageLayout>
-  {/* Login in the upper right corner */}
-  <div className="flex justify-end">
-    <div className="flex items-center">
-      
-    </div>
-  </div>
-
   
+
+
 {/* Button area */}
 <div className="flex justify-center mb-6">
   {currentUser?.role === 'Admin' ? (
