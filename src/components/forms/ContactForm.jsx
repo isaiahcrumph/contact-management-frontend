@@ -155,11 +155,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     }));
   };
 
-  const fillDummyData = () => {
-    // Arrays of valid first and last names
-    const firstNames = ['John', 'Jane', 'Robert', 'Maria', 'David', 'Sarah', 'Michael', 'Emma', 'William', 'Lisa'];
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Garcia', 'Rodriguez', 'Wilson'];
-    
+
     // Randomly select names from the arrays
     const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
     const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
@@ -382,14 +378,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         </div>
       </div>
       
-      <div className="flex justify-end space-x-2 pt-4">
-        <button 
-          type="button" 
-          onClick={fillDummyData}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-        >
-          Fill Test Data
-        </button>
+
         <button 
           type="button" 
           onClick={onCancel}
