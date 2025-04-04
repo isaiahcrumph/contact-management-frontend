@@ -378,7 +378,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         </div>
       </div>
       
-
+      <div className="flex justify-end space-x-2 pt-4">
         <button 
           type="button" 
           onClick={onCancel}
