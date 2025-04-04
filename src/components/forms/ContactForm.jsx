@@ -155,7 +155,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     }));
   };
 
-
+    
     // Randomly select names from the arrays
     const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
     const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
@@ -214,7 +214,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     if (validateForm()) {
       onSubmit(formData);
     }
-  };
+  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -396,5 +396,4 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     </form>
   );
 };
-
 export default ContactForm;
