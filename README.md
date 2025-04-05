@@ -1,12 +1,45 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+⚙️ Frontend Setup Instructions
 
-Currently, two official plugins are available:
+This is the React frontend for the Contacts Management App. It connects to an ASP.NET Core backend API and provides full CRUD functionality for managing contacts, along with authentication features.
+📋 Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Make sure you have the following installed:
 
-## Expanding the ESLint configuration
+    Node.js v22.14.0
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+    npm (comes with Node.js)
+
+🚀 Getting Started
+
+    Clone the frontend repo:
+
+git clone https://github.com/your-username/your-frontend-repo.git
+cd your-frontend-repo
+
+    Install dependencies:
+
+npm install
+
+    Set up environment variables (if needed):
+
+If your app uses a .env file for things like API base URLs, create one in the root directory and add your variables like this:
+
+VITE_API_URL=http://localhost:5000/api
+
+    Adjust the API URL based on where your backend is running.
+
+    Run the app:
+
+npm run dev
+
+This will start the Vite development server and open the app in your browser (usually at http://localhost:5173).
+🧪 Running Tests
+
+No tests are currently included.
+💬 Notes
+
+    Make sure your backend API is running at the same time for the frontend to connect successfully.
+
+    This project is built with modern React and Vite for fast builds and hot reloading.
+  
