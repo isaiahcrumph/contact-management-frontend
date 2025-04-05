@@ -155,35 +155,6 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     }));
   };
 
-    
-    // Randomly select names from the arrays
-    const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    const dummyData = {
-      id: 0,
-      firstName: randomFirst,
-      lastName: randomLast,
-      email: `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}@example.com`,
-      phoneNumber: `555-${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-      address: `${Math.floor(Math.random() * 9000) + 1000} Main Street`,
-      city: 'Seattle',
-      state: 'WA',
-      zipCode: '98101'
-    };
-    
-    setFormData(dummyData);
-    
-    // Clear all errors since dummy data is valid
-    //setErrors({});
-    
-    // Mark all fields as touched
-    const allTouched = {};
-    Object.keys(dummyData).forEach(key => {
-      allTouched[key] = true;
-    });
-    setTouched(allTouched);
-  };
 
   // Validate all fields for form submission
   const validateForm = () => {
@@ -214,7 +185,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     if (validateForm()) {
       onSubmit(formData);
     }
-  
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -379,6 +350,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
       </div>
       
       <div className="flex justify-end space-x-2 pt-4">
+
         <button 
           type="button" 
           onClick={onCancel}
@@ -396,4 +368,5 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
     </form>
   );
 };
+
 export default ContactForm;
