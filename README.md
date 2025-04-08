@@ -33,10 +33,10 @@ npm install
 
 npm run dev
 
-The app will be available at http://localhost:5173 by default.
-
     ⚠️ Ensure your backend API is running at the same time.
-    If your frontend makes direct requests (e.g. via Axios), make sure the backend is reachable at the correct URL — typically http://localhost:5000 or whatever your ASP.NET server is using.
+    If your frontend makes direct requests (e.g. via Axios), 
+    make sure the backend is reachable at the correct URL — typically 
+    http://localhost:5000 or whatever your ASP.NET server is using.
 
     This project is built with modern React and Vite for fast builds and hot reloading.
   
