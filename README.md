@@ -21,11 +21,7 @@ cd your-frontend-repo
 
 npm install
 
-    Set up environment variables (if needed):
-
-If your app uses a .env file for things like API base URLs, create one in the root directory and add your variables like this:
-
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5173
 
     Adjust the API URL based on where your backend is running.
 
