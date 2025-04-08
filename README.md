@@ -1,41 +1,41 @@
+🚀 Contact Management Frontend
 
-⚙️ Frontend Setup Instructions
+This is the React frontend for the Contact Management application. It connects to a .NET Core backend API and provides full CRUD functionality, user authentication, and a contact table interface.
 
-This is the React frontend for the Contacts Management App. It connects to an ASP.NET Core backend API and provides full CRUD functionality for managing contacts, along with authentication features.
-📋 Prerequisites
+Frontend Repo: isaiahcrumph/contact-management-frontend
+Tech Stack: React (Vite) · Axios
+Backend: .NET Core API (add link if available)
+Database: SQL Server
+📦 Requirements
 
-Make sure you have the following installed:
+Before running the app, ensure you have the following installed:
 
     Node.js v22.14.0
+    Download Node.js
 
-    npm (comes with Node.js)
+    npm (comes with Node)
 
-🚀 Getting Started
+🛠️ Installation & Setup
 
-    Clone the frontend repo:
+    Clone the repository:
 
-git clone https://github.com/your-username/your-frontend-repo.git
-cd your-frontend-repo
+git clone https://github.com/isaiahcrumph/contact-management-frontend.git
+cd contact-management-frontend
 
     Install dependencies:
 
 npm install
 
-VITE_API_URL=http://localhost:5173
-
-    Adjust the API URL based on where your backend is running.
-
-    Run the app:
+    Run the development server:
 
 npm run dev
 
-This will start the Vite development server and open the app in your browser (usually at http://localhost:5173).
-🧪 Running Tests
+The app will be available at http://localhost:5173 by default.
 
-No tests are currently included.
-💬 Notes
+    ⚠️ Ensure your backend API is running at the same time.
+    If your frontend makes direct requests (e.g. via Axios), make sure the backend is reachable at the correct URL — typically http://localhost:5000 or whatever your ASP.NET server is using.
 
-    Make sure your backend API is running at the same time for the frontend to connect successfully.
+
 
     This project is built with modern React and Vite for fast builds and hot reloading.
   
