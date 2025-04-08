@@ -3,8 +3,11 @@
 This is the React frontend for the Contact Management application. It connects to a .NET Core backend API and provides full CRUD functionality, user authentication, and a contact table interface.
 
 Frontend Repo: isaiahcrumph/contact-management-frontend
+
 Tech Stack: React (Vite) · Axios
+
 Backend: .NET Core API (add link if available)
+
 Database: SQL Server
 📦 Requirements
 
