@@ -6,15 +6,24 @@ const API_VERSION = 'v1';
 
 const contactsService = {
   // Get all contacts
-  getContacts: async () => {
-    try {
-      const response = await apiClient.get(`/${API_VERSION}/contacts`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching contacts:', error);
-      throw error;
-    }
-  },
+// Fetch contacts with optional query params
+getContacts: async ({ search = '', page = 1, pageSize = 10 } = {}) => {
+  try {
+    const response = await apiClient.get(`/v1/contacts/paged`, {
+      params: {
+        search,
+        page,
+        pageSize
+      }
+    });
+
+    return response.data; // Must return: { data: [...], totalCount: number }
+  } catch (error) {
+    console.error('Error fetching paged contacts:', error);
+    throw error;
+  }
+},
+
   
   // Get a single contact by ID
   getContact: async (id) => {

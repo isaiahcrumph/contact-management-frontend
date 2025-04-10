@@ -5,8 +5,9 @@ import PageLayout from '../components/layout/PageLayout';
 import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
-import { contactService, authService } from '../services/api';
+import { contactsService, authService } from '../services/api';
 import ContactDetailsModal from '../components/models/ContactDetailsModal';
+
 
 const HomePage = () => {
   const [contacts, setContacts] = useState([]);
@@ -22,6 +23,11 @@ const HomePage = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10); // Optional: make this dynamic later
+  const [totalCount, setTotalCount] = useState(0);
+  
 
 
   
@@ -37,7 +43,7 @@ useEffect(() => {
 
   // Load contacts
   fetchContacts();
-}, [navigate]);
+}, [navigate, searchTerm, currentPage]);
 
 // Add this useEffect in your HomePage.jsx
 // Place it near your other useEffect hooks
@@ -64,20 +70,28 @@ isAuthenticated: () => {
   return !!token;
 }
 
-  // Fetch contacts from API
-  const fetchContacts = async () => {
-    try {
-      setLoading(true);
-      const data = await contactService.getAllContacts();
-      setContacts(Array.isArray(data) ? data : (data.contacts || []));
-      setError(null);
-    } catch (err) {
-      setError('Failed to load contacts. Please try again.');
-      setContacts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchContacts = async () => {
+  try {
+    setLoading(true);
+
+    const result = await contactsService.getContacts({
+      search: searchTerm,
+      page: currentPage,
+      pageSize: pageSize
+    });
+
+    // The backend is expected to return: { data: [...], totalCount: number }
+    setContacts(Array.isArray(result.data) ? result.data : []);
+    setTotalCount(result.totalCount || 0);
+    setError(null);
+  } catch (err) {
+    console.error("❌ Error in fetchContacts:", err);
+    setError('Failed to load contacts. Please try again.');
+    setContacts([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle logout
   const handleLogout = () => {

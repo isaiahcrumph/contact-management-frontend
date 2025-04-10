@@ -12,8 +12,8 @@ const ContactsTable = ({ contacts, loading, error, selectedContactId, onSelectCo
 
   if (error) {
     return (
-      <div role="alert" className="text-red-500 p-4">
-        An error occurred while loading contacts.
+      <div>
+
       </div>
     );
   }
