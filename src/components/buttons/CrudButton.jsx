@@ -21,7 +21,6 @@ const CrudButton = ({ type, onClick, label, disabled = false }) => {
       className={`${colorClass} text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       }`}
-      aria-label={label}
     >
       {label}
     </button>
