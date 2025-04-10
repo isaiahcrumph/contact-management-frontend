@@ -188,9 +188,16 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">{formData.id ? 'Edit Contact' : 'Create Contact'}</h2>
-      
+    <form 
+      onSubmit={handleSubmit} 
+      className="space-y-4" 
+      role="form" 
+      aria-labelledby="contact-form-title"
+    >
+      <h2 id="contact-form-title" className="text-xl font-bold">
+        {formData.id ? 'Edit Contact' : 'Create Contact'}
+      </h2>
+  
       {/* First Name field */}
       <div>
         <label htmlFor="firstName" className="block mb-1">First Name</label>
@@ -202,6 +209,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="John"
+          aria-required="true"
           className={`w-full px-3 py-2 bg-gray-700 border ${
             touched.firstName && errors.firstName ? 'border-red-500' : 'border-gray-600'
           } rounded-md text-white`}
@@ -210,7 +218,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         {touched.firstName && errors.firstName && 
           <p id="firstName-error" className="text-red-500 mt-1">{errors.firstName}</p>}
       </div>
-
+  
       {/* Last Name field */}
       <div>
         <label htmlFor="lastName" className="block mb-1">Last Name</label>
@@ -222,6 +230,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="Smith"
+          aria-required="true"
           className={`w-full px-3 py-2 bg-gray-700 border ${
             touched.lastName && errors.lastName ? 'border-red-500' : 'border-gray-600'
           } rounded-md text-white`}
@@ -230,7 +239,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         {touched.lastName && errors.lastName && 
           <p id="lastName-error" className="text-red-500 mt-1">{errors.lastName}</p>}
       </div>
-      
+  
+      {/* Email field */}
       <div>
         <label htmlFor="email" className="block mb-1">Email</label>
         <input
@@ -241,6 +251,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="FirstLast@example.com"
+          aria-required="true"
           className={`w-full px-3 py-2 bg-gray-700 border ${
             touched.email && errors.email ? 'border-red-500' : 'border-gray-600'
           } rounded-md text-white`}
@@ -249,7 +260,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         {touched.email && errors.email && 
           <p id="email-error" className="text-red-500 mt-1">{errors.email}</p>}
       </div>
-      
+  
+      {/* Phone Number */}
       <div>
         <label htmlFor="phoneNumber" className="block mb-1">Phone Number</label>
         <input
@@ -260,6 +272,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="555-123-4567"
+          aria-required="true"
           className={`w-full px-3 py-2 bg-gray-700 border ${
             touched.phoneNumber && errors.phoneNumber ? 'border-red-500' : 'border-gray-600'
           } rounded-md text-white`}
@@ -270,7 +283,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
         {!errors.phoneNumber && 
           <p className="text-gray-400 text-xs mt-1">Format: 555-123-4567</p>}
       </div>
-      
+  
+      {/* Address (optional) */}
       <div>
         <label htmlFor="address" className="block mb-1">Address (Optional)</label>
         <input
@@ -281,11 +295,13 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="123 Main Street"
+          aria-required="false"
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
       </div>
-      
+  
       <div className="grid grid-cols-3 gap-4">
+        {/* City */}
         <div>
           <label htmlFor="city" className="block mb-1">City</label>
           <input
@@ -296,6 +312,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder="Seattle"
+            aria-required="true"
             className={`w-full px-3 py-2 bg-gray-700 border ${
               touched.city && errors.city ? 'border-red-500' : 'border-gray-600'
             } rounded-md text-white`}
@@ -304,7 +321,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           {touched.city && errors.city && 
             <p id="city-error" className="text-red-500 mt-1">{errors.city}</p>}
         </div>
-        
+  
+        {/* State */}
         <div>
           <label htmlFor="state" className="block mb-1">State</label>
           <input
@@ -316,6 +334,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
             onBlur={handleBlur}
             placeholder="WA"
             maxLength="2"
+            aria-required="true"
             className={`w-full px-3 py-2 bg-gray-700 border ${
               touched.state && errors.state ? 'border-red-500' : 'border-gray-600'
             } rounded-md text-white uppercase`}
@@ -326,7 +345,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
           {!errors.state && 
             <p className="text-gray-400 text-xs mt-1">2 uppercase letters (WA)</p>}
         </div>
-        
+  
+        {/* ZIP Code */}
         <div>
           <label htmlFor="zipCode" className="block mb-1">ZIP Code</label>
           <input
@@ -337,6 +357,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder="98101"
+            aria-required="true"
             className={`w-full px-3 py-2 bg-gray-700 border ${
               touched.zipCode && errors.zipCode ? 'border-red-500' : 'border-gray-600'
             } rounded-md text-white`}
@@ -348,9 +369,8 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
             <p className="text-gray-400 text-xs mt-1">5 digits or 5+4 format</p>}
         </div>
       </div>
-      
+  
       <div className="flex justify-end space-x-2 pt-4">
-
         <button 
           type="button" 
           onClick={onCancel}
@@ -367,6 +387,7 @@ const ContactForm = ({ contact, onSubmit, onCancel }) => {
       </div>
     </form>
   );
+  
 };
 
 export default ContactForm;

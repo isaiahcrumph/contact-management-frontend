@@ -11,7 +11,12 @@ const Message = ({ type = 'info', message, onClose }) => {
   const bgClass = types[type] || types.info;
 
   return (
-    <div className={`${bgClass} border px-4 py-3 rounded relative mb-4`} role="alert">
+    <div
+      className={`${bgClass} border px-4 py-3 rounded relative mb-4`}
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
       <span className="block sm:inline">{message}</span>
       {onClose && (
         <button
@@ -19,7 +24,7 @@ const Message = ({ type = 'info', message, onClose }) => {
           className="absolute top-0 bottom-0 right-0 px-4 py-3"
           aria-label="Close notification"
         >
-          <span className="text-xl">&times;</span>
+          <span className="text-xl" aria-hidden="true">&times;</span>
         </button>
       )}
     </div>
