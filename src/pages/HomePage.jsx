@@ -5,8 +5,13 @@ import PageLayout from '../components/layout/PageLayout';
 import CrudButton from '../components/buttons/CrudButton';
 import ContactsTable from '../components/tables/ContactsTable';
 import ContactForm from '../components/forms/ContactForm';
-import { contactService, authService } from '../services/api';
+import { contactsService, authService } from '../services/api';
 import ContactDetailsModal from '../components/models/ContactDetailsModal';
+import SearchBar from '../components/search/SearchBar';
+import PaginationControls from '../components/pagination/PaginationControls';
+
+
+
 
 const HomePage = () => {
   const [contacts, setContacts] = useState([]);
@@ -22,6 +27,11 @@ const HomePage = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10); // Optional: make this dynamic later
+  const [totalCount, setTotalCount] = useState(0);
+  
 
 
   
@@ -37,7 +47,7 @@ useEffect(() => {
 
   // Load contacts
   fetchContacts();
-}, [navigate]);
+}, [navigate, searchTerm, currentPage]);
 
 // Add this useEffect in your HomePage.jsx
 // Place it near your other useEffect hooks
@@ -64,20 +74,30 @@ isAuthenticated: () => {
   return !!token;
 }
 
-  // Fetch contacts from API
-  const fetchContacts = async () => {
-    try {
-      setLoading(true);
-      const data = await contactService.getAllContacts();
-      setContacts(Array.isArray(data) ? data : (data.contacts || []));
-      setError(null);
-    } catch (err) {
-      setError('Failed to load contacts. Please try again.');
-      setContacts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchContacts = async () => {
+  try {
+    setLoading(true);
+
+    const result = await contactsService.getContacts({
+      name: searchTerm, // 👈 this now maps to ?name=James
+      page: currentPage,
+      pageSize: pageSize,
+      sortby: sortField,
+      order: sortDirection
+    });
+
+    setContacts(Array.isArray(result.data) ? result.data : []);
+    setTotalCount(result.totalCount || 0);
+    setError(null);
+  } catch (err) {
+    console.error("❌ Error in fetchContacts:", err);
+    setError('Failed to load contacts. Please try again.');
+    setContacts([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Handle logout
   const handleLogout = () => {
@@ -106,7 +126,7 @@ isAuthenticated: () => {
 
     try {
       setLoading(true);
-      const contact = await contactService.getContactById(selectedContactId);
+      const contact = await contactsService.getContact(selectedContactId);
       setCurrentContact(contact);
       setShowForm(true);
     } catch (err) {
@@ -129,7 +149,7 @@ isAuthenticated: () => {
   const confirmDelete = async () => {
     try {
       setLoading(true);
-      await contactService.deleteContact(selectedContactId);
+      await contactsService.deleteContact(selectedContactId);
       setMessage({ type: 'success', message: 'Contact deleted successfully' });
       setSelectedContactId(null);
       setShowDeleteConfirm(false);
@@ -199,13 +219,13 @@ const handleSort = (field) => {
       setLoading(true);
       if (formData.id) {
         // Update
-        await contactService.updateContact(formData);
+        await contactsService.updateContact(formData.id, formData); // ✅ FIXED
         setMessage({ type: 'success', message: 'Contact updated successfully' });
       } else {
         // Create
-        await contactService.createContact(formData);
+        await contactsService.createContact(formData);
         setMessage({ type: 'success', message: 'Contact created successfully' });
-      }
+      }      
       setShowForm(false);
       setCurrentContact(null);
       await fetchContacts();
@@ -232,7 +252,7 @@ const handleSort = (field) => {
     try {
       setLoading(true);
       console.log("Fetching contact details...");
-      const contact = await contactService.getContactById(id);
+      const contact = await contactsService.getContact(id);
       console.log("Fetched contact:", contact);
       setViewingContact(contact);
       setShowDetailsModal(true);
@@ -321,64 +341,84 @@ const handleSort = (field) => {
   
   <div className="bg-gray-800 p-6 rounded-lg shadow-md">
 
-  {!showForm && (
-  <div className="flex justify-end mb-4">
-    <div className="flex items-center">
-      <label htmlFor="sort-field" className="text-gray-300 mr-2">Sort by:</label>
-      <select
-        id="sort-field"
-        value={sortField}
-        onChange={(e) => setSortField(e.target.value)}
-        className="bg-gray-700 text-white px-3 py-2 rounded mr-2"
-      >
-        <option value="name">Name</option>
-        <option value="email">Email</option>
-        <option value="phoneNumber">Phone</option>
-        <option value="city">City</option>
-        <option value="state">State</option>
-      </select>
-      
-      <button
-        onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-        className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded flex items-center"
-        title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
-      >
-        {sortDirection === 'asc' ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        )}
-      </button>
+{/* Show form OR table + controls */}
+{!showForm ? (
+  <>
+    {/* Search Bar */}
+    <SearchBar
+      value={searchTerm}
+      onChange={(val) => {
+        setSearchTerm(val);
+        setCurrentPage(1); // Reset to page 1 when searching
+      }}
+    />
+
+    {/* Sort Controls */}
+    <div className="flex justify-end mb-4">
+      <div className="flex items-center">
+        <label htmlFor="sort-field" className="text-gray-300 mr-2">Sort by:</label>
+        <select
+          id="sort-field"
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          className="bg-gray-700 text-white px-3 py-2 rounded mr-2"
+        >
+          <option value="name">Name</option>
+          <option value="email">Email</option>
+          <option value="phoneNumber">Phone</option>
+          <option value="city">City</option>
+          <option value="state">State</option>
+        </select>
+
+        <button
+          onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+          className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded flex items-center"
+          title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+        >
+          {sortDirection === 'asc' ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          )}
+        </button>
+      </div>
     </div>
-  </div>
+
+    {/* Contacts Table */}
+    <ContactsTable 
+      contacts={getSortedContacts()} 
+      loading={loading} 
+      error={error}
+      selectedContactId={selectedContactId}
+      onSelectContact={handleSelectContact}
+      onViewContact={handleViewContact}
+      onSort={handleSort}
+      sortField={sortField}
+      sortDirection={sortDirection}
+    />
+
+    {/* Pagination Controls */}
+    <PaginationControls
+      currentPage={currentPage}
+      pageSize={pageSize}
+      totalCount={totalCount}
+      onPageChange={(page) => setCurrentPage(page)}
+    />
+  </>
+) : (
+  // Form for create/update
+  <ContactForm 
+    contact={currentContact} 
+    onSubmit={handleFormSubmit} 
+    onCancel={handleFormCancel} 
+  />
 )}
+</div>
 
-    {showForm ? (
-      <ContactForm 
-        contact={currentContact} 
-        onSubmit={handleFormSubmit} 
-        onCancel={handleFormCancel} 
-      />
-    ) : (
-
-      
-      <ContactsTable 
-  contacts={getSortedContacts()} 
-  loading={loading} 
-  error={error}
-  selectedContactId={selectedContactId}
-  onSelectContact={handleSelectContact}
-  onViewContact={handleViewContact}
-  onSort={handleSort}
-  sortField={sortField}
-  sortDirection={sortDirection}
-/>
-    )}
-  </div>
 {/* Add the modal */}
 {showDetailsModal && (
       <ContactDetailsModal 
