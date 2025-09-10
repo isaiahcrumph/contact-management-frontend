@@ -1,0 +1,6 @@
+name = "contact-management-demo"
+compatibility_date = "2025-06-11"
+main = "workers-site/index.js"
+
+[site]
+bucket = "./dist"
